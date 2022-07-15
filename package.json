@@ -1,0 +1,23 @@
+{
+  "name": "react-ticketing",
+  "version": "1.0.0",
+  "description": "Support ticket app",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon -r dotenv/config backend/server.js"
+  },
+  "keywords": [],
+  "author": "ali@afalahi.com",
+  "license": "MIT",
+  "devDependencies": {
+    "colors": "^1.4.0",
+    "nodemon": "^2.0.19"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "helmet": "^5.1.0",
+    "mongoose": "^6.4.4"
+  }
+}
