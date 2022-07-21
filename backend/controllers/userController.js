@@ -11,23 +11,29 @@ const AppError = require('../utils/AppError');
  */
 const registerUser = async (req, res, next) => {
   try {
-    const { name, email, password } = req.body;
+    const { firstName, lastName, email, password, passwordConfirm } = req.body;
 
-    if (!name || !email || !password) {
+    if (!firstName || !lastName || !email || !password) {
       return next(new AppError('Missing a required field', 400));
     }
     const exits = await User.findOne({ email });
     if (exits) {
       return next(new AppError('User Already exists', 400));
     }
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
 
-    const user = await User.create({ name, email, password: hashedPassword });
+    const user = await User.create({
+      firstName,
+      lastName,
+      email,
+      password,
+      passwordConfirm,
+    });
     if (user) {
       res.status(201).json({
         _id: user._id,
-        name: user.name,
+        firstName,
+        lastName,
+        name: `${firstName} ${lastName}`,
         email: user.email,
         token: generateToken(user),
       });
@@ -52,7 +58,9 @@ const loginUser = async (req, res, next) => {
     if (user && (await bcrypt.compare(password, user.password))) {
       res.status(200).json({
         _id: user._id,
-        name: user.name,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        name: `${user.firstName} ${user.lastName}`,
         email: user.email,
         token: generateToken(user),
       });
@@ -66,7 +74,7 @@ const loginUser = async (req, res, next) => {
 
 const getMe = (req, res, next) => {
   try {
-    res.json(res.locals.token);
+    res.json(req.user);
   } catch (error) {
     return next(error);
   }

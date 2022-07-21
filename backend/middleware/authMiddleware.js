@@ -21,7 +21,7 @@ const protect = async (req, res, next) => {
           return next(new AppError(error.message, 401));
         }
         return User.findById(token._id)
-          .select('-password')
+          .select('name email')
           .then(result => {
             if (!result) {
               return next(new AppError('No user was found by that ID', 404));
