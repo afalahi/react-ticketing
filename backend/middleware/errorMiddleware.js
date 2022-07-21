@@ -1,10 +1,14 @@
-const handleCastErrorDB = require('../utils/handleCastError');
+const { handleCastError, handleValidationError } = require('../utils/mongoDBErrors');
 
 const errorHandler = (error, req, res, next) => {
   let err = { ...error };
-  let message = error.message
+  let message = error.message;
   if (error.name === 'CastError') {
-    err = handleCastErrorDB(err);
+    err = handleCastError(err);
+    message = err.message;
+  }
+  if(error.name === 'ValidationError') {
+    err = handleValidationError(err)
     message = err.message
   }
   const statusCode = error.statusCode || 500;
