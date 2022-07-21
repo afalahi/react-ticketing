@@ -1,0 +1,96 @@
+import React from 'react';
+import { Link as RouterLink } from 'react-router-dom';
+import {
+  Box,
+  HStack,
+  Link as NavLink,
+  Flex,
+  ButtonGroup,
+  Button,
+  Text,
+  useBreakpointValue,
+  Container,
+  useColorModeValue,
+} from '@chakra-ui/react';
+import { FaSignInAlt, FaSignOutAlt, FaUserAlt, FaUser } from 'react-icons/fa';
+import { ColorModeSwitcher } from '../utils/ColorModeSwitcher';
+
+const Header = () => {
+  return (
+    <Box as='section' pb={{ base: '4', md: '10' }}>
+      <Box
+        as='nav'
+        borderBottom={1}
+        borderStyle={'solid'}
+        borderColor={useColorModeValue('gray.200', 'gray.900')}
+      >
+        <Container maxW={'7xl'}>
+          <Flex
+            bg={useColorModeValue('white', 'gray.800')}
+            color={useColorModeValue('gray.600', 'white')}
+            justify={'space-between'}
+            flex='1'
+            align='center'
+            minWidth={'max-content'}
+          >
+            <HStack spacing='8' justify={'space-between'}>
+              <NavLink
+                as={RouterLink}
+                to='/'
+                _hover={{ textDecoration: 'none' }}
+              >
+                <Text>Support Desk</Text>
+              </NavLink>
+              <ButtonGroup variant={'link'}>
+                {['new'].map(item => (
+                  <Button
+                    key={item}
+                    as={RouterLink}
+                    to={`/tickets/${item}`}
+                    textTransform={'capitalize'}
+                    p={'6'}
+                    borderBottom={'2px solid transparent'}
+                    borderRadius='0'
+                    _hover={{
+                      textDecoration: 'none',
+                      color: 'purple.400',
+                      borderBottom: '2px solid',
+                      borderRadius: '0',
+                    }}
+                  >
+                    {item}
+                  </Button>
+                ))}
+              </ButtonGroup>
+            </HStack>
+            <ButtonGroup gap={2} p={4}>
+              <ColorModeSwitcher />
+              <Button
+                variant={'outline'}
+                colorScheme={'blackAlpha'}
+                color={useColorModeValue('gray.500', 'white')}
+                as={RouterLink}
+                to='/login'
+                leftIcon={<FaSignInAlt />}
+              >
+                Login
+              </Button>
+              <Button
+                bg={'purple.500'}
+                color={'white'}
+                _hover={{ bg: 'purple.400' }}
+                as={RouterLink}
+                to='/register'
+                leftIcon={<FaUser />}
+              >
+                Register
+              </Button>
+            </ButtonGroup>
+          </Flex>
+        </Container>
+      </Box>
+    </Box>
+  );
+};
+
+export default Header;

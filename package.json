@@ -4,22 +4,26 @@
   "description": "Support ticket app",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon -r dotenv/config backend/server.js"
+    "start": "node -r dotenv/config backend/server.js",
+    "server": "nodemon -r dotenv/config backend/server.js",
+    "client": "npm run dev --prefix frontend",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "keywords": [],
   "author": "ali@afalahi.com",
   "license": "MIT",
   "devDependencies": {
     "colors": "^1.4.0",
+    "concurrently": "^7.3.0",
+    "dotenv": "^16.0.1",
     "nodemon": "^2.0.19"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "dotenv": "^16.0.1",
     "express": "^4.18.1",
-    "express-async-handler": "^1.2.0",
     "helmet": "^5.1.0",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^6.4.4"
+    "mongoose": "^6.4.4",
+    "validator": "^13.7.0"
   }
 }
