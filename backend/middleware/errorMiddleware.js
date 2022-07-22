@@ -1,4 +1,7 @@
-const { handleCastError, handleValidationError } = require('../utils/mongoDBErrors');
+const {
+  handleCastError,
+  handleValidationError,
+} = require('../utils/mongoDBErrors');
 
 const errorHandler = (error, req, res, next) => {
   let err = { ...error };
@@ -7,14 +10,15 @@ const errorHandler = (error, req, res, next) => {
     err = handleCastError(err);
     message = err.message;
   }
-  if(error.name === 'ValidationError') {
-    err = handleValidationError(err)
-    message = err.message
+  if (error.name === 'ValidationError') {
+    err = handleValidationError(err);
+    message = err.message;
   }
-  const statusCode = error.statusCode || 500;
+  const statusCode = err.statusCode || 500;
   const status = error.status || 'error';
+  statusCode === 405 && res.setHeader('Allow', 'POST');
   res.status(statusCode).json({
-    message,
+    message: statusCode === 500 ? 'Oops something went wrong' : message,
     status,
     stack: process.env.NODE_ENV === 'production' ? null : error.stack,
   });
