@@ -6,11 +6,11 @@ const userSchema = new Schema(
   {
     firstName: {
       type: String,
-      required: [true, 'please enter a name'],
+      required: [true, 'please enter your first name'],
     },
     lastName: {
       type: String,
-      required: [true, 'please enter a name'],
+      required: [true, 'please enter your last name'],
     },
     email: {
       type: String,
@@ -30,7 +30,7 @@ const userSchema = new Schema(
           'The {PATH}: ({VALUE}), does not meet the minimum requirements',
       },
     },
-    passwordConfirm: {
+    confirmPassword: {
       type: String,
       required: [true, 'Retype your password'],
       validate: {

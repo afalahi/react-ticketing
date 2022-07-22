@@ -11,9 +11,9 @@ const AppError = require('../utils/AppError');
  */
 const registerUser = async (req, res, next) => {
   try {
-    const { firstName, lastName, email, password, passwordConfirm } = req.body;
+    const { firstName, lastName, email, password, confirmPassword } = req.body;
 
-    if (!firstName || !lastName || !email || !password) {
+    if (!firstName || !lastName || !email || !password || !confirmPassword) {
       return next(new AppError('Missing a required field', 400));
     }
     const exits = await User.findOne({ email });
@@ -26,14 +26,13 @@ const registerUser = async (req, res, next) => {
       lastName,
       email,
       password,
-      passwordConfirm,
+      confirmPassword,
     });
     if (user) {
       res.status(201).json({
         _id: user._id,
         firstName,
         lastName,
-        name: `${firstName} ${lastName}`,
         email: user.email,
         token: generateToken(user),
       });
@@ -60,7 +59,6 @@ const loginUser = async (req, res, next) => {
         _id: user._id,
         firstName: user.firstName,
         lastName: user.lastName,
-        name: `${user.firstName} ${user.lastName}`,
         email: user.email,
         token: generateToken(user),
       });
@@ -81,13 +79,17 @@ const getMe = (req, res, next) => {
 };
 
 const generateToken = user => {
-  const { _id, email, name } = user;
-  return jwt.sign({ _id, email, name }, process.env.JWT_SECRET, {
-    subject: email,
-    audience: 'support_desk',
-    expiresIn: '1h',
-    issuer: 'supportdesk.com',
-  });
+  const { _id, email, firstName, lastName } = user;
+  return jwt.sign(
+    { _id, email, name: `${firstName} ${lastName}` },
+    process.env.JWT_SECRET,
+    {
+      subject: email,
+      audience: 'support_desk',
+      expiresIn: '1h',
+      issuer: 'supportdesk.com',
+    }
+  );
 };
 module.exports = {
   registerUser,
