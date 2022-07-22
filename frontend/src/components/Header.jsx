@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import {
   Box,
   HStack,
@@ -11,18 +11,39 @@ import {
   useBreakpointValue,
   Container,
   useColorModeValue,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuDivider,
+  MenuItem,
+  Center,
+  Avatar,
 } from '@chakra-ui/react';
 import { FaSignInAlt, FaSignOutAlt, FaUserAlt, FaUser } from 'react-icons/fa';
+
 import { ColorModeSwitcher } from '../utils/ColorModeSwitcher';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout } from '../features/auth/authSlice';
 
 const Header = () => {
+  const { user } = useSelector(state => state.auth);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  //don't use hooks in conditionals rule
+  const loginButtonColor = useColorModeValue('gray.500', 'white');
+
+  const onLogout = e => {
+    dispatch(logout());
+    navigate('/');
+  };
   return (
     <Box as='section' pb={{ base: '4', md: '10' }}>
       <Box
         as='nav'
         borderBottom={1}
         borderStyle={'solid'}
-        borderColor={useColorModeValue('gray.200', 'gray.900')}
+        borderColor={useColorModeValue('gray.200', 'gray.700')}
       >
         <Container maxW={'7xl'}>
           <Flex
@@ -32,6 +53,7 @@ const Header = () => {
             flex='1'
             align='center'
             minWidth={'max-content'}
+            h={16}
           >
             <HStack spacing='8' justify={'space-between'}>
               <NavLink
@@ -41,7 +63,7 @@ const Header = () => {
               >
                 <Text>Support Desk</Text>
               </NavLink>
-              <ButtonGroup variant={'link'}>
+              {/* <ButtonGroup variant={'link'}>
                 {['new'].map(item => (
                   <Button
                     key={item}
@@ -61,30 +83,75 @@ const Header = () => {
                     {item}
                   </Button>
                 ))}
-              </ButtonGroup>
+              </ButtonGroup> */}
             </HStack>
             <ButtonGroup gap={2} p={4}>
               <ColorModeSwitcher />
-              <Button
-                variant={'outline'}
-                colorScheme={'blackAlpha'}
-                color={useColorModeValue('gray.500', 'white')}
-                as={RouterLink}
-                to='/login'
-                leftIcon={<FaSignInAlt />}
-              >
-                Login
-              </Button>
-              <Button
-                bg={'purple.500'}
-                color={'white'}
-                _hover={{ bg: 'purple.400' }}
-                as={RouterLink}
-                to='/register'
-                leftIcon={<FaUser />}
-              >
-                Register
-              </Button>
+              {user ? (
+                <Menu>
+                  <MenuButton
+                    as={'button'}
+                    rounded={'full'}
+                    variant={'link'}
+                    cursor={'pointer'}
+                    minw={0}
+                  >
+                    <HStack>
+                      <Avatar
+                        size={'sm'}
+                        src={
+                          'https://avatars.dicebear.com/api/male/username.svg'
+                        }
+                      />
+                    </HStack>
+                  </MenuButton>
+                  <MenuList alignItems={'center'}>
+                    {/* <br /> */}
+                    <Center>
+                      <Avatar
+                        size={'lg'}
+                        src={
+                          'https://avatars.dicebear.com/api/male/username.svg'
+                        }
+                      />
+                    </Center>
+                    {/* <br /> */}
+                    <Center>
+                      <p>
+                        {user.firstName} {user.lastName}
+                      </p>
+                    </Center>
+                    {/* <br /> */}
+                    <MenuDivider />
+                    <MenuItem onClick={onLogout} icon={<FaSignOutAlt />}>
+                      Logout
+                    </MenuItem>
+                  </MenuList>
+                </Menu>
+              ) : (
+                <>
+                  <Button
+                    variant={'outline'}
+                    colorScheme={'blackAlpha'}
+                    color={loginButtonColor}
+                    as={RouterLink}
+                    to='/login'
+                    leftIcon={<FaSignInAlt />}
+                  >
+                    Login
+                  </Button>
+                  <Button
+                    bg={'purple.500'}
+                    color={'white'}
+                    _hover={{ bg: 'purple.400' }}
+                    as={RouterLink}
+                    to='/register'
+                    leftIcon={<FaUser />}
+                  >
+                    Register
+                  </Button>
+                </>
+              )}
             </ButtonGroup>
           </Flex>
         </Container>

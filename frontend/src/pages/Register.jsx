@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FaUser, FaEye, FaEyeSlash } from 'react-icons/fa';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import {
   Box,
   Flex,
@@ -17,9 +17,14 @@ import {
   InputRightElement,
   FormErrorMessage,
   Link,
+  useToast,
 } from '@chakra-ui/react';
+import { useSelector, useDispatch } from 'react-redux';
+
+import { register } from '../features/auth/authSlice';
 
 const Register = () => {
+  //State variables
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -27,16 +32,28 @@ const Register = () => {
     password: '',
     confirmPassword: '',
   });
+  //this is for the Chakra-Ui password reveal icon and dynamic input type switching
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setConfirmShowPassword] = useState(false);
+  //error state to display for form validation
   const [error, setError] = useState({ ...formData, error: false });
+  //destructuring state date
   const { firstName, lastName, email, password, confirmPassword } = formData;
 
+  //Redux component setup
+  const dispatch = useDispatch();
+  const { user, isLoading } = useSelector(state => state.auth);
+
+  useEffect(() => {
+    if (user) navigate('/');
+  }, [user]);
+  //Defining on change function to set the state with form values
   const onChange = e => {
     setFormData(prevState => ({
       ...prevState,
       [e.target.name]: e.target.value,
     }));
+    //validating passwords match, this should be extracted to it's own validation function
     setError(prev => {
       const stateObj = { ...prev, confirmPassword: '', error: false };
       switch (e.target.name) {
@@ -54,8 +71,26 @@ const Register = () => {
     });
   };
 
+  //Submitting the data to our API with an onSubmit function
+  const navigate = useNavigate();
+  const toast = useToast();
+
   const onSubmit = e => {
     e.preventDefault();
+    const userData = { ...formData };
+    dispatch(register(userData))
+      .unwrap()
+      .then(() => {
+        navigate('/');
+      })
+      .catch(err => {
+        toast({
+          description: err,
+          status: 'error',
+          duration: 5000,
+          position: 'top',
+        });
+      });
   };
   return (
     <Flex minH={'20vh'} align={'center'} justify={'center'} color={'gray.500'}>
@@ -67,12 +102,15 @@ const Register = () => {
             textAlign='center'
             color={'gray.600'}
           >
-            <Icon as={FaUser} boxSize={'8'} /> Register
+            <HStack>
+              <Icon as={FaUser} boxSize={'8'} /> <Text>Register</Text>
+            </HStack>
           </Heading>
           <Text color={'gray.600'} fontSize={'lg'}>
             Please Create an Account
           </Text>
         </Stack>
+        {/* This box component is being rendered as a form with the as prop */}
         <Box
           rounded={'lg'}
           boxShadow={'lg'}

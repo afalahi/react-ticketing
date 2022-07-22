@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FaEye, FaEyeSlash, FaSignInAlt } from 'react-icons/fa';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import {
   Box,
   Flex,
@@ -15,7 +15,12 @@ import {
   Button,
   InputRightElement,
   Link,
+  HStack,
+  useToast,
 } from '@chakra-ui/react';
+import { useSelector, useDispatch } from 'react-redux';
+
+import { login } from '../features/auth/authSlice';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -23,33 +28,48 @@ const Login = () => {
     password: '',
   });
   const [showPassword, setShowPassword] = useState(false);
-  // const [error, setError] = useState({ ...formData, error: false });
   const { email, password } = formData;
+
+  const dispatch = useDispatch();
+  const { user, isLoading } = useSelector(state => state.auth);
+
+  const toast = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) navigate('/');
+  }, [user]);
 
   const onChange = e => {
     setFormData(prevState => ({
       ...prevState,
       [e.target.name]: e.target.value,
     }));
-    // setError(prev => {
-    //   const stateObj = { ...prev, confirmPassword: '', error: false };
-    //   switch (e.target.name) {
-    //     case 'confirmPassword':
-    //       if (password && e.target.value !== password) {
-    //         stateObj[e.target.name] =
-    //           'Password and Confirm Password do not match';
-    //         stateObj.error = true;
-    //       }
-    //       break;
-    //     default:
-    //       break;
-    //   }
-    //   return stateObj;
-    // });
   };
 
   const onSubmit = e => {
     e.preventDefault();
+    const userData = { ...formData };
+
+    dispatch(login(userData))
+      .unwrap()
+      .then(user => {
+        toast({
+          description: `Welcome back ${user.firstName}`,
+          status: 'success',
+          duration: 5000,
+          position: 'top',
+        });
+        navigate('/');
+      })
+      .catch(error => {
+        toast({
+          status: 'error',
+          description: error,
+          duration: 5000,
+          position: 'top',
+        });
+      });
   };
   return (
     <Flex minH={'20vh'} align={'center'} justify={'center'} color={'gray.500'}>
@@ -61,7 +81,9 @@ const Login = () => {
             textAlign='center'
             color={'gray.600'}
           >
-            <Icon as={FaSignInAlt} boxSize='8' /> Login
+            <HStack>
+              <Icon as={FaSignInAlt} /> <Text>Login</Text>
+            </HStack>
           </Heading>
           <Text color={'gray.600'} fontSize={'lg'}>
             Sign In to Your Account
