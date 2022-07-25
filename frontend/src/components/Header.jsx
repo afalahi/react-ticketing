@@ -18,8 +18,11 @@ import {
   MenuItem,
   Center,
   Avatar,
+  useDisclosure,
+  IconButton,
 } from '@chakra-ui/react';
-import { FaSignInAlt, FaSignOutAlt, FaUserAlt, FaUser } from 'react-icons/fa';
+import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons';
+import { FaSignInAlt, FaSignOutAlt, FaUser } from 'react-icons/fa';
 
 import { ColorModeSwitcher } from './ColorModeSwitcher';
 import authService from '../features/auth/authService';
@@ -29,9 +32,8 @@ import AuthContext from '../Context/AuthContext';
 const Header = () => {
   const { user, dispatch } = useContext(AuthContext);
   const navigate = useNavigate();
-
-  //don't use hooks in conditionals rule
   const loginButtonColor = useColorModeValue('gray.500', 'white');
+  const { isOpen, onToggle } = useDisclosure();
 
   const onLogout = e => {
     authService.logout();
@@ -56,36 +58,9 @@ const Header = () => {
             minWidth={'max-content'}
             h={16}
           >
-            <HStack spacing='8' justify={'space-between'}>
-              <NavLink
-                as={RouterLink}
-                to='/'
-                _hover={{ textDecoration: 'none' }}
-              >
-                <Text>Support Desk</Text>
-              </NavLink>
-              {/* <ButtonGroup variant={'link'}>
-                {['new'].map(item => (
-                  <Button
-                    key={item}
-                    as={RouterLink}
-                    to={`/tickets/${item}`}
-                    textTransform={'capitalize'}
-                    p={'6'}
-                    borderBottom={'2px solid transparent'}
-                    borderRadius='0'
-                    _hover={{
-                      textDecoration: 'none',
-                      color: 'purple.400',
-                      borderBottom: '2px solid',
-                      borderRadius: '0',
-                    }}
-                  >
-                    {item}
-                  </Button>
-                ))}
-              </ButtonGroup> */}
-            </HStack>
+            <NavLink as={RouterLink} to='/' _hover={{ textDecoration: 'none' }}>
+              <Text>Support Desk</Text>
+            </NavLink>
             <ButtonGroup gap={2} p={4}>
               <ColorModeSwitcher />
               {user ? (
@@ -154,6 +129,24 @@ const Header = () => {
                 </>
               )}
             </ButtonGroup>
+            <Flex
+              flex={{ base: 1, md: 'auto' }}
+              ml={{ base: -2 }}
+              display={{ base: 'flex', md: 'none' }}
+            >
+              <IconButton
+                onClick={onToggle}
+                icon={
+                  isOpen ? (
+                    <CloseIcon w='3' h='3' />
+                  ) : (
+                    <HamburgerIcon w='3' h='3' />
+                  )
+                }
+                variant={'ghost'}
+                aria-label={'Toggle Navigation'}
+              />
+            </Flex>
           </Flex>
         </Container>
       </Box>
