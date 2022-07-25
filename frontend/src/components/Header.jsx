@@ -21,20 +21,21 @@ import {
 } from '@chakra-ui/react';
 import { FaSignInAlt, FaSignOutAlt, FaUserAlt, FaUser } from 'react-icons/fa';
 
-import { ColorModeSwitcher } from '../utils/ColorModeSwitcher';
-import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../features/auth/authSlice';
+import { ColorModeSwitcher } from './ColorModeSwitcher';
+import authService from '../features/auth/authService';
+import { useContext } from 'react';
+import AuthContext from '../Context/AuthContext';
 
 const Header = () => {
-  const { user } = useSelector(state => state.auth);
-  const dispatch = useDispatch();
+  const { user, dispatch } = useContext(AuthContext);
   const navigate = useNavigate();
 
   //don't use hooks in conditionals rule
   const loginButtonColor = useColorModeValue('gray.500', 'white');
 
   const onLogout = e => {
-    dispatch(logout());
+    authService.logout();
+    dispatch({ type: 'USER_LOGOUT' });
     navigate('/');
   };
   return (

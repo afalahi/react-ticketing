@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { FaEye, FaEyeSlash, FaSignInAlt } from 'react-icons/fa';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import {
@@ -18,21 +18,19 @@ import {
   HStack,
   useToast,
 } from '@chakra-ui/react';
-import { useSelector, useDispatch } from 'react-redux';
 
-import { login } from '../features/auth/authSlice';
+import authService from '../actions/authActions';
+import Loading from '../components/Loading';
+import AuthContext from '../Context/AuthContext';
 
 const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
-  const [showPassword, setShowPassword] = useState(false);
   const { email, password } = formData;
-
-  const dispatch = useDispatch();
-  const { user, isLoading } = useSelector(state => state.auth);
-
+  const [showPassword, setShowPassword] = useState(false);
+  const { user, isLoading, dispatch } = useContext(AuthContext);
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -49,11 +47,11 @@ const Login = () => {
 
   const onSubmit = e => {
     e.preventDefault();
-    const userData = { ...formData };
-
-    dispatch(login(userData))
-      .unwrap()
+    dispatch({ type: 'SET_LOADING' });
+    authService
+      .login(formData)
       .then(user => {
+        dispatch({ type: 'USER_LOGIN', payload: user });
         toast({
           description: `Welcome back ${user.firstName}`,
           status: 'success',
@@ -71,6 +69,10 @@ const Login = () => {
         });
       });
   };
+
+  if (isLoading) {
+    return <Loading />;
+  }
   return (
     <Flex minH={'20vh'} align={'center'} justify={'center'} color={'gray.500'}>
       <Stack spacing={8} mx={'auto'} maxW={'lg'} py={12} px={6}>

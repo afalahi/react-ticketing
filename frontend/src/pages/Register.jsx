@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { FaUser, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import {
@@ -19,11 +19,14 @@ import {
   Link,
   useToast,
 } from '@chakra-ui/react';
-import { useSelector, useDispatch } from 'react-redux';
 
-import { register } from '../features/auth/authSlice';
+import Loading from '../components/Loading';
+import authService from '../actions/authActions';
+import AuthContext from '../Context/AuthContext';
 
 const Register = () => {
+  const navigate = useNavigate();
+  const toast = useToast();
   //State variables
   const [formData, setFormData] = useState({
     firstName: '',
@@ -36,13 +39,11 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setConfirmShowPassword] = useState(false);
   //error state to display for form validation
-  const [error, setError] = useState({ ...formData, error: false });
+  const [formError, setFormError] = useState({ ...formData, error: false });
   //destructuring state date
   const { firstName, lastName, email, password, confirmPassword } = formData;
 
-  //Redux component setup
-  const dispatch = useDispatch();
-  const { user, isLoading } = useSelector(state => state.auth);
+  const { user, isLoading, dispatch } = useContext(AuthContext);
 
   useEffect(() => {
     if (user) navigate('/');
@@ -54,7 +55,7 @@ const Register = () => {
       [e.target.name]: e.target.value,
     }));
     //validating passwords match, this should be extracted to it's own validation function
-    setError(prev => {
+    setFormError(prev => {
       const stateObj = { ...prev, confirmPassword: '', error: false };
       switch (e.target.name) {
         case 'confirmPassword':
@@ -72,26 +73,35 @@ const Register = () => {
   };
 
   //Submitting the data to our API with an onSubmit function
-  const navigate = useNavigate();
-  const toast = useToast();
-
   const onSubmit = e => {
     e.preventDefault();
+    dispatch({ type: 'SET_LOADING' });
     const userData = { ...formData };
-    dispatch(register(userData))
-      .unwrap()
-      .then(() => {
+    authService
+      .register(formData)
+      .then(user => {
+        dispatch({ type: 'USER_REGISTER', payload: user });
+        toast({
+          description: `Welcome ${user.firstName}`,
+          status: 'success',
+          duration: 5000,
+          position: 'top',
+        });
         navigate('/');
       })
-      .catch(err => {
+      .catch(error => {
         toast({
-          description: err,
           status: 'error',
+          description: error,
           duration: 5000,
           position: 'top',
         });
       });
   };
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
     <Flex minH={'20vh'} align={'center'} justify={'center'} color={'gray.500'}>
       <Stack spacing={8} mx={'auto'} maxW={'lg'} py={12} px={6}>
@@ -180,7 +190,7 @@ const Register = () => {
             <FormControl
               id='confirmPassword'
               isRequired
-              isInvalid={error.confirmPassword}
+              isInvalid={formError.confirmPassword}
             >
               <FormLabel>Confirm Password</FormLabel>
               <InputGroup>
@@ -208,8 +218,8 @@ const Register = () => {
                   </Button>
                 </InputRightElement>
               </InputGroup>
-              {error.error && (
-                <FormErrorMessage>{error.confirmPassword}</FormErrorMessage>
+              {formError.error && (
+                <FormErrorMessage>{formError.confirmPassword}</FormErrorMessage>
               )}
             </FormControl>
             <Stack spacing={10} pt={2}>
@@ -220,7 +230,7 @@ const Register = () => {
                 color={'white'}
                 _hover={{ bg: 'purple.400' }}
                 type={'submit'}
-                isDisabled={error.error}
+                isDisabled={formError.error}
               >
                 Sign up
               </Button>
