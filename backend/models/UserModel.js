@@ -40,6 +40,11 @@ const userSchema = new Schema(
         message: "Passwords don't match.",
       },
     },
+    isAgent: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
     isAdmin: {
       type: Boolean,
       required: true,
@@ -52,7 +57,7 @@ const userSchema = new Schema(
 );
 userSchema.pre('save', async function (next) {
   this.password = await bcrypt.hash(this.password, 10);
-  this.passwordConfirm = undefined;
+  this.confirmPassword = undefined;
 
   next();
 });

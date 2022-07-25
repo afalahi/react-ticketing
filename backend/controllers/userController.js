@@ -13,9 +13,6 @@ const registerUser = async (req, res, next) => {
   try {
     const { firstName, lastName, email, password, confirmPassword } = req.body;
 
-    if (!firstName || !lastName || !email || !password || !confirmPassword) {
-      return next(new AppError('Missing a required field', 400));
-    }
     const exits = await User.findOne({ email });
     if (exits) {
       return next(new AppError('User Already exists', 400));
@@ -40,7 +37,7 @@ const registerUser = async (req, res, next) => {
       return next(new AppError('Invalid user data', 400));
     }
   } catch (error) {
-    return next(error);
+    return next(new AppError(error, 500));
   }
 };
 
@@ -66,7 +63,7 @@ const loginUser = async (req, res, next) => {
       return next(new AppError('Invalid Credentials', 401));
     }
   } catch (error) {
-    return next(error);
+    return next(new AppError(error, 500));
   }
 };
 
