@@ -9,7 +9,7 @@ const protect = async (req, res, next) => {
       const message = !authorization
         ? 'Unauthorized, missing authorization header'
         : 'Unauthorized, invalid token in header';
-      return next(new AppError(message, 401));
+      return next(new AppError(message, 403));
     }
     const token = authorization.split(' ')[1];
     jwt.verify(
@@ -21,17 +21,19 @@ const protect = async (req, res, next) => {
           return next(new AppError(error.message, 401));
         }
         return User.findById(token._id)
-          .select('name email')
+          .select('-password -__v -isAdmin')
           .then(result => {
             if (!result) {
-              return next(new AppError('No user was found by that ID', 404));
+              return next(
+                new AppError('Unauthorized: User does not exit', 401)
+              );
             }
             req.user = result;
             res.locals.token = token;
             next();
           })
           .catch(error => {
-            return next(error);
+            return next(new AppError(error, 401));
           });
       }
     );
