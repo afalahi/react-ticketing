@@ -1,3 +1,5 @@
+/** @format */
+
 class AppError extends Error {
   constructor(message, statusCode) {
     super(message);
@@ -9,4 +11,4 @@ class AppError extends Error {
     Error.captureStackTrace(this, this.constructor);
   }
 }
-module.exports =  AppError
+module.exports = AppError;
