@@ -1,6 +1,9 @@
+/** @format */
+
 const {
   handleCastError,
   handleValidationError,
+  handleDuplicateKeyError,
 } = require('../utils/mongoDBErrors');
 
 const errorHandler = (error, req, res, next) => {
@@ -10,12 +13,16 @@ const errorHandler = (error, req, res, next) => {
     err = handleCastError(err);
     message = err.message;
   }
+  if (error.code === 11000) {
+    err = handleDuplicateKeyError(err);
+    message = err.message;
+  }
   if (error.name === 'ValidationError') {
     err = handleValidationError(err);
     message = err.message;
   }
   const statusCode = err.statusCode || 500;
-  const status = error.status || 'error';
+  const status = err.status || 'error';
   statusCode === 405 && res.setHeader('Allow', 'POST');
   res.status(statusCode).json({
     message: statusCode === 500 ? 'Oops something went wrong' : message,
