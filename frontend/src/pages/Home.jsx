@@ -1,6 +1,6 @@
 /** @format */
 
-import { Box, Button, Center, Container, VStack } from '@chakra-ui/react';
+import { Box, Button, Center, VStack } from '@chakra-ui/react';
 
 const Home = () => {
   return (
