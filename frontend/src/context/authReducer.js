@@ -1,3 +1,5 @@
+/** @format */
+
 const authReducer = (state, action) => {
   switch (action.type) {
     case 'USER_LOGIN':
@@ -21,7 +23,7 @@ const authReducer = (state, action) => {
     case 'SET_LOADING':
       return {
         ...state,
-        isLoading: true,
+        isLoading: action.payload,
       };
     default:
       return state;
