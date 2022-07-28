@@ -1,3 +1,5 @@
+/** @format */
+
 import { useState, useEffect, useContext } from 'react';
 import { FaEye, FaEyeSlash, FaSignInAlt } from 'react-icons/fa';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
@@ -38,29 +40,30 @@ const Login = () => {
     if (user) navigate('/');
   }, [user]);
 
-  const onChange = e => {
-    setFormData(prevState => ({
+  const onChange = (e) => {
+    setFormData((prevState) => ({
       ...prevState,
       [e.target.name]: e.target.value,
     }));
   };
 
-  const onSubmit = e => {
+  const onSubmit = (e) => {
     e.preventDefault();
-    dispatch({ type: 'SET_LOADING' });
+    dispatch({ type: 'SET_LOADING', payload: true });
     authService
       .login(formData)
-      .then(user => {
+      .then((user) => {
         dispatch({ type: 'USER_LOGIN', payload: user });
         toast({
-          description: `Welcome back ${user.firstName}`,
+          description: `Welcome back, ${user.firstName}!`,
           status: 'success',
           duration: 5000,
           position: 'top',
         });
         navigate('/');
       })
-      .catch(error => {
+      .catch((error) => {
+        dispatch({ type: 'SET_LOADING', payload: false });
         toast({
           status: 'error',
           description: error,
@@ -122,7 +125,7 @@ const Login = () => {
                   <Button
                     variant={'ghost'}
                     onClick={() =>
-                      setShowPassword(showPassword => !showPassword)
+                      setShowPassword((showPassword) => !showPassword)
                     }
                   >
                     {showPassword ? (

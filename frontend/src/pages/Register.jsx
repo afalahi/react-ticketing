@@ -1,3 +1,5 @@
+/** @format */
+
 import { useState, useEffect, useContext } from 'react';
 import { FaUser, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
@@ -49,13 +51,13 @@ const Register = () => {
     if (user) navigate('/');
   }, [user]);
   //Defining on change function to set the state with form values
-  const onChange = e => {
-    setFormData(prevState => ({
+  const onChange = (e) => {
+    setFormData((prevState) => ({
       ...prevState,
       [e.target.name]: e.target.value,
     }));
     //validating passwords match, this should be extracted to it's own validation function
-    setFormError(prev => {
+    setFormError((prev) => {
       const stateObj = { ...prev, confirmPassword: '', error: false };
       switch (e.target.name) {
         case 'confirmPassword':
@@ -73,23 +75,23 @@ const Register = () => {
   };
 
   //Submitting the data to our API with an onSubmit function
-  const onSubmit = e => {
+  const onSubmit = (e) => {
     e.preventDefault();
     dispatch({ type: 'SET_LOADING' });
     const userData = { ...formData };
     authService
       .register(formData)
-      .then(user => {
+      .then((user) => {
         dispatch({ type: 'USER_REGISTER', payload: user });
         toast({
-          description: `Welcome ${user.firstName}`,
+          description: `Welcome, ${user.firstName}!`,
           status: 'success',
           duration: 5000,
           position: 'top',
         });
         navigate('/');
       })
-      .catch(error => {
+      .catch((error) => {
         toast({
           status: 'error',
           description: error,
@@ -175,7 +177,7 @@ const Register = () => {
                   <Button
                     variant={'ghost'}
                     onClick={() =>
-                      setShowPassword(showPassword => !showPassword)
+                      setShowPassword((showPassword) => !showPassword)
                     }
                   >
                     {showPassword ? (
@@ -206,7 +208,7 @@ const Register = () => {
                     variant={'ghost'}
                     onClick={() =>
                       setConfirmShowPassword(
-                        showConfirmPassword => !showConfirmPassword
+                        (showConfirmPassword) => !showConfirmPassword
                       )
                     }
                   >
