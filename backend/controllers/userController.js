@@ -1,8 +1,11 @@
+/** @format */
+
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const User = require('../models/UserModel');
 const AppError = require('../utils/AppError');
+const responseHandler = require('../utils/responseHandler');
 /**
  *
  * @desc register new user
@@ -11,33 +14,17 @@ const AppError = require('../utils/AppError');
  */
 const registerUser = async (req, res, next) => {
   try {
-    const { firstName, lastName, email, password, confirmPassword } = req.body;
-
-    const exits = await User.findOne({ email });
-    if (exits) {
-      return next(new AppError('User Already exists', 400));
-    }
-
-    const user = await User.create({
-      firstName,
-      lastName,
-      email,
-      password,
-      confirmPassword,
-    });
-    if (user) {
-      res.status(201).json({
-        _id: user._id,
-        firstName,
-        lastName,
-        email: user.email,
-        token: generateToken(user),
-      });
-    } else {
-      return next(new AppError('Invalid user data', 400));
-    }
+    const user = await User.create(req.body);
+    const body = {
+      _id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      token: generateToken(user),
+    };
+    responseHandler(res, body, 201);
   } catch (error) {
-    return next(new AppError(error, 500));
+    return next(error);
   }
 };
 
@@ -52,30 +39,31 @@ const loginUser = async (req, res, next) => {
   try {
     const user = await User.findOne({ email });
     if (user && (await bcrypt.compare(password, user.password))) {
-      res.status(200).json({
+      const body = {
         _id: user._id,
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
         token: generateToken(user),
-      });
+      };
+      responseHandler(res, body);
     } else {
       return next(new AppError('Invalid Credentials', 401));
     }
-  } catch (error) {
-    return next(new AppError(error, 500));
-  }
-};
-
-const getMe = (req, res, next) => {
-  try {
-    res.json(req.user);
   } catch (error) {
     return next(error);
   }
 };
 
-const generateToken = user => {
+const getMe = (req, res, next) => {
+  try {
+    responseHandler(res, req.user);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+const generateToken = (user) => {
   const { _id, email, firstName, lastName } = user;
   return jwt.sign(
     { _id, email, name: `${firstName} ${lastName}` },
