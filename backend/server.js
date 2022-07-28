@@ -1,3 +1,5 @@
+/** @format */
+
 const express = require('express');
 const colors = require('colors');
 
@@ -6,7 +8,7 @@ const routes = require('./routes');
 const { errorHandler } = require('./middleware/errorMiddleware');
 const AppError = require('./utils/AppError');
 
-const PORT = process.env.SERVER_PORT || 5000;
+const PORT = process.env.SERVER_PORT || 3000;
 
 connectDB();
 const app = express();
