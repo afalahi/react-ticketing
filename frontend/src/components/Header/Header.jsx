@@ -1,7 +1,5 @@
 /** @format */
-
 import React, { useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Flex,
@@ -17,18 +15,11 @@ import MenuToggle from './MenuToggle';
 import ProfileIcon from './ProfileIcon';
 import AuthButtons from './AuthButtons';
 import AuthContext from '../../Context/AuthContext';
-import authService from '../../actions/authActions';
 
 const Header = () => {
-  const { user, dispatch } = useContext(AuthContext);
-  const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
   const { isOpen, onToggle } = useDisclosure();
 
-  const onLogout = (e) => {
-    authService.logout();
-    dispatch({ type: 'USER_LOGOUT' });
-    navigate('/');
-  };
   return (
     <Box as='section' pb={{ base: '4', md: '10' }}>
       <Box
@@ -56,14 +47,11 @@ const Header = () => {
                   lg: 'flex-end',
                 }}
                 direction={{ base: 'column', md: 'row' }}
-                pt={[4, 4, 0, 0]}
+                pt={3}
+                pb={3}
               >
                 <ColorModeSwitcher />
-                {user ? (
-                  <ProfileIcon user={user} onLogout={onLogout} />
-                ) : (
-                  <AuthButtons />
-                )}
+                {user ? <ProfileIcon /> : <AuthButtons />}
               </Stack>
             </Box>
           </Flex>

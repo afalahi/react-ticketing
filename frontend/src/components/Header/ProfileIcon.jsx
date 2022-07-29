@@ -1,5 +1,5 @@
 /** @format */
-
+import { useContext } from 'react';
 import {
   Menu,
   MenuButton,
@@ -11,8 +11,21 @@ import {
   HStack,
 } from '@chakra-ui/react';
 import { FaSignOutAlt } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
-const ProfileIcon = ({ user, onLogout }) => {
+import AuthContext from '../../Context/AuthContext';
+import authService from '../../actions/authActions';
+
+const ProfileIcon = () => {
+  const { user, dispatch } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const onLogout = e => {
+    authService.logout();
+    dispatch({ type: 'USER_LOGOUT' });
+    navigate('/');
+  };
+
   return (
     <Menu>
       <MenuButton rounded={'full'} variant={'link'} cursor={'pointer'} minW={0}>
