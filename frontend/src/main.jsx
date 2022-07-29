@@ -10,7 +10,6 @@ import { AuthProvider } from './Context/AuthContext';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    {/* <Provider store={store}> */}
     <AuthProvider>
       <ChakraProvider theme={theme}>
         <BrowserRouter>
@@ -18,6 +17,5 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         </BrowserRouter>
       </ChakraProvider>
     </AuthProvider>
-    {/* </Provider> */}
   </React.StrictMode>
 );
