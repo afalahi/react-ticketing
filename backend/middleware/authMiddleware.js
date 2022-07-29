@@ -18,6 +18,9 @@ const protect = async (req, res, next) => {
       { audience: 'support_desk', issuer: 'supportdesk.com' },
       (error, token) => {
         if (error) {
+          if (error.name === 'TokenExpiredError') {
+            return next(new AppError('Please log in again', 401));
+          }
           return next(new AppError(error.message, 401));
         }
         return User.findById(token._id)
