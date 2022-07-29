@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useContext } from 'react';
 import { FaEye, FaEyeSlash, FaSignInAlt } from 'react-icons/fa';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
 import {
   Box,
   Flex,
@@ -35,39 +35,44 @@ const Login = () => {
   const { user, isLoading, dispatch } = useContext(AuthContext);
   const toast = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (user) navigate('/');
   }, [user]);
 
-  const onChange = (e) => {
-    setFormData((prevState) => ({
+  const onChange = e => {
+    setFormData(prevState => ({
       ...prevState,
       [e.target.name]: e.target.value,
     }));
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = e => {
     e.preventDefault();
     dispatch({ type: 'SET_LOADING', payload: true });
     authService
       .login(formData)
-      .then((user) => {
+      .then(user => {
         dispatch({ type: 'USER_LOGIN', payload: user });
         toast({
           description: `Welcome back, ${user.firstName}!`,
           status: 'success',
-          duration: 5000,
+          duration: 2000,
           position: 'top',
         });
-        navigate('/');
+        if (location.state?.from) {
+          navigate(location.state?.from);
+        } else {
+          navigate('/');
+        }
       })
-      .catch((error) => {
+      .catch(error => {
         dispatch({ type: 'SET_LOADING', payload: false });
         toast({
           status: 'error',
           description: error,
-          duration: 5000,
+          duration: 3000,
           position: 'top',
         });
       });
@@ -100,9 +105,8 @@ const Login = () => {
           p={8}
           as={'form'}
           onSubmit={onSubmit}
-          width={'md'}
         >
-          <Stack spacing={4} width={'sm'}>
+          <Stack width={['xxs', 'xs', 'sm']}>
             <FormControl id='email' isRequired>
               <FormLabel>Email</FormLabel>
               <Input
@@ -125,7 +129,7 @@ const Login = () => {
                   <Button
                     variant={'ghost'}
                     onClick={() =>
-                      setShowPassword((showPassword) => !showPassword)
+                      setShowPassword(showPassword => !showPassword)
                     }
                   >
                     {showPassword ? (
